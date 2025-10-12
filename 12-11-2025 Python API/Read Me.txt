@@ -1,0 +1,15 @@
+Mastering Data Retrieval and Integration
+
+Step1: 
+Getting the API Key
+For getting it I am taking it from the website: https://openweathermap.org/
+From under my username>My API KEY
+
+https://home.openweathermap.org/api_keys
+
+Below it the API key from the websiteS
+Example: dagagagavrj188884846aagga681 
+
+# Note don't share this with any one this is dangerous
+
+https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
