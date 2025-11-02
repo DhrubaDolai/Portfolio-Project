@@ -1,60 +1,444 @@
-Mastering Data Retrieval and Integration
+# Django Weather Application
 
-Step1: 
-Getting the API Key
-For getting it I am taking it from the website: https://openweathermap.org/
-From under my username>My API KEY
+A Django web application that displays current weather information using the OpenWeatherMap API. The app allows users to search for any city worldwide and view real-time weather data including temperature, humidity, wind speed, and weather conditions.
 
-https://home.openweathermap.org/api_keys
+![Weather App Screenshot](screenshot.png)
 
-Below it the API key from the websiteS
-Example: dagagagavrj188884846aagga681 
+## Features
 
-# Note don't share this with any one this is dangerous
+- 🌍 Search weather by city name (global coverage)
+- 🌡️ Display current temperature in Celsius
+- 💧 Show humidity percentage
+- 💨 Display wind speed
+- ☁️ Weather condition descriptions with icons
+- 📱 Responsive Bootstrap design
+- 🔒 Secure API key management with environment variables
+- ⚡ Real-time data from OpenWeatherMap API
 
-https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+## Technologies Used
 
-    Step2: Creating the Weather app using Django
-        a) Create a virtual envirnment open the cmd and typing python -m venv vnev
-        b) Activate the virtual envirnment typing the command vnev\Scripts\activate.bat
-        c) Then install Django by typing the command pip install Django
-        d) After installing Django run the command django-admin startproject core .
-        e) Then type code . to open visual code
-        f) Then python manage.py startapp weather
-        g) After that type 'weather', in the settings.py in the INSTALLED_APPS = [] in the core file which we created using the command django-admin startproject core . this will install the newly created app.
-        h) After this in the cmd type python manage.py runserver (this will run the server)
-        g) Go the the weather file which you created and create a .py file for urls and put the below code
-            from django.urls import path
-            from .views import index
+- **Backend:** Python 3.13, Django 5.2.7
+- **Frontend:** HTML5, CSS3, Bootstrap 5.3.8
+- **API:** OpenWeatherMap API
+- **Environment Management:** python-decouple
+- **Version Control:** Git & GitHub
 
-            urlpatterns = [
-            path('', index, name='index'),
-            ]
+---
 
-    (adding the app name in INSTALLED_APPS activates the app within your Django project, making its resources and code part of the overall application. Also, it create a path to open our project over here in the core project)
-        h) Then got the core>urls.py then add path('', include('weather.urls')),
+## Project Setup Guide
 
-        Like below:
-        from django.contrib import admin
-        from django.urls import path, include
+### Step 1: Getting the API Key
 
-        urlpatterns = [
-            path('admin/', admin.site.urls),
-            path('', include('weather.urls')),
-        ]
-        Here weather is the name of the application and urls is the project folder.
+1. Visit [OpenWeatherMap](https://openweathermap.org/)
+2. Create a free account or log in
+3. Navigate to: **Username → My API Keys**
+   - Or go directly to: https://home.openweathermap.org/api_keys
+4. Copy your API key (Example format: `dagagagavrj188884846aagga681`)
 
-        i) Now we need to create a index view to create the web site in the front end
-            from django.shortcuts import render
+⚠️ **IMPORTANT:** Never share your API key publicly or commit it to GitHub!
 
-            # Create your views here.
+---
 
-            def index(request):
-            return render(request, 'weather/index.html')
+### Step 2: Creating the Weather App with Django
 
-        j) To check what is you are getting out of the API use the breakpoint() after getting data using the follow code response = requests.get(url)
-        data = response.json()
-        data
-        This will save the data from the api you can see the data in the cmd for further the analysis
-    
-    Step3: Protect your API Key
+#### 2.1 Set Up Virtual Environment
+
+Open your terminal/command prompt and navigate to your project directory:
+
+Create virtual environment
+python -m venv venv
+
+Activate virtual environment
+Windows:
+venv\Scripts\activate
+
+Mac/Linux:
+source venv/bin/activate
+
+text
+
+#### 2.2 Install Django and Dependencies
+
+Install Django
+pip install Django
+
+Install requests library (for API calls)
+pip install requests
+
+Install python-decouple (for environment variables)
+pip install python-decouple
+
+text
+
+#### 2.3 Create Django Project
+
+Create Django project named 'core'
+django-admin startproject core .
+
+Open in VS Code (optional)
+code .
+
+text
+
+#### 2.4 Create Weather App
+
+Create the weather application
+python manage.py startapp weather
+
+text
+
+#### 2.5 Register the App
+
+Open `core/settings.py` and add `'weather'` to `INSTALLED_APPS`:
+
+INSTALLED_APPS = [
+'django.contrib.admin',
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.messages',
+'django.contrib.staticfiles',
+'weather', # Add this line
+]
+
+text
+
+**Why?** Adding the app name in `INSTALLED_APPS` activates it within your Django project, making its resources and code part of the overall application.
+
+#### 2.6 Configure URLs
+
+**Create `weather/urls.py`:**
+
+from django.urls import path
+from .views import index
+
+urlpatterns = [
+path('', index, name='index'),
+]
+
+text
+
+**Update `core/urls.py`:**
+
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+path('admin/', admin.site.urls),
+path('', include('weather.urls')), # Add this line
+]
+
+text
+
+**What this does:** Creates a URL route that connects the main project to the weather app. When users visit the homepage, Django will use the weather app's `index` view.
+
+#### 2.7 Create Views
+
+Create or update `weather/views.py`:
+
+from django.shortcuts import render
+import requests
+from decouple import config
+
+def index(request):
+city = request.GET.get('city', 'New York')
+api_key = config('API_KEY') # Get from .env file
+url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+
+text
+weather_data = {}
+error_message = None
+
+try:
+    response = requests.get(url)
+    response.raise_for_status()
+    data = response.json()
+
+    if data.get('cod') != 200:
+        raise Exception(f"City {city} not found")
+
+    weather_data = {
+        'city': data['name'],
+        'country': data['sys']['country'],
+        'temperature': data['main']['temp'],
+        'description': data['weather']['description'],
+        'humidity': data['main']['humidity'],
+        'wind_speed': data['wind']['speed'],
+        'icon': data['weather']['icon'],
+    }
+except requests.exceptions.HTTPError as e:
+    if e.response.status_code == 404:
+        error_message = f"City '{city}' not found. Please check the spelling."
+    else:
+        error_message = f"Error fetching weather data: {str(e)}"
+except requests.exceptions.RequestException as e:
+    error_message = f"Network error: {str(e)}"
+except Exception as e:
+    error_message = f"An error occurred: {str(e)}"
+
+return render(request, 'weather/index.html', {
+    'weather_data': weather_data,
+    'error_message': error_message
+})
+text
+
+**Debugging Tip:** To inspect API response data, add this temporarily in your view:
+
+response = requests.get(url)
+data = response.json()
+breakpoint() # This will pause execution and let you inspect 'data'
+
+text
+
+Then you can examine the API response structure in the terminal.
+
+#### 2.8 Create Templates
+
+Create the directory structure:
+weather/
+├── templates/
+│ └── weather/
+│ └── index.html
+
+text
+
+Create your HTML template in `weather/templates/weather/index.html` (see full template in repository).
+
+#### 2.9 Add Static Files (Optional)
+
+If you have a favicon:
+
+weather/
+├── static/
+│ └── weather/
+│ └── favicon.png
+
+text
+
+Reference it in your HTML with:
+{% load static %}
+
+<link rel="shortcut icon" href="{% static 'weather/favicon.png' %}" type="image/x-icon"> ```
+Step 3: Protect Your API Key 🔒
+CRITICAL: Never commit API keys to GitHub! Follow these steps:
+
+3.1 Install python-decouple
+text
+pip install python-decouple
+3.2 Create .env File
+Create a file named .env in your project root (same directory as manage.py):
+
+text
+API_KEY=your_actual_api_key_here
+SECRET_KEY=your_django_secret_key_here
+DEBUG=True
+Replace:
+
+your_actual_api_key_here with your OpenWeatherMap API key
+
+your_django_secret_key_here with your Django secret key from settings.py
+
+3.3 Update settings.py
+Add this at the top of core/settings.py:
+
+text
+from pathlib import Path
+from decouple import config  # Add this import
+
+# Get SECRET_KEY from .env
+SECRET_KEY = config('SECRET_KEY')
+
+# Get DEBUG from .env
+DEBUG = config('DEBUG', default=False, cast=bool)
+3.4 Update views.py
+Already done in Step 2.7 - we use config('API_KEY') instead of hardcoding.
+
+3.5 Create .gitignore
+Create a .gitignore file in your project root:
+
+text
+# Environment variables
+.env
+*.env
+
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Virtual Environment
+venv/
+vnev/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+3.6 Create .env.example
+Create a template file .env.example (this WILL be uploaded to GitHub):
+
+text
+API_KEY=your_openweather_api_key_here
+SECRET_KEY=your_django_secret_key_here
+DEBUG=True
+This helps other developers know what environment variables they need.
+
+Running the Application
+First Time Setup
+text
+# 1. Clone the repository
+git clone https://github.com/yourusername/weather-app.git
+cd weather-app
+
+# 2. Create virtual environment
+python -m venv venv
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Mac/Linux
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Set up environment variables
+copy .env.example .env  # Windows
+# cp .env.example .env  # Mac/Linux
+
+# Edit .env and add your actual API keys
+
+# 5. Run migrations
+python manage.py migrate
+
+# 6. Start development server
+python manage.py runserver
+Access the Application
+Open your browser and visit: http://127.0.0.1:8000/
+
+API Reference
+OpenWeatherMap Current Weather API:
+
+text
+GET https://api.openweathermap.org/data/2.5/weather
+Parameters:
+
+q - City name (e.g., "London", "New York")
+
+appid - Your API key
+
+units - Temperature units (metric for Celsius, imperial for Fahrenheit)
+
+Example Response:
+
+text
+{
+  "name": "London",
+  "sys": {"country": "GB"},
+  "main": {
+    "temp": 15.5,
+    "humidity": 72
+  },
+  "weather": [
+    {
+      "description": "scattered clouds",
+      "icon": "03d"
+    }
+  ],
+  "wind": {"speed": 3.5}
+}
+Project Structure
+text
+weather-app/
+├── .env                      # Environment variables (NOT in Git)
+├── .env.example              # Template for environment variables
+├── .gitignore               # Git ignore file
+├── requirements.txt         # Python dependencies
+├── manage.py                # Django management script
+├── README.md                # This file
+├── core/                    # Django project settings
+│   ├── __init__.py
+│   ├── settings.py          # Project settings
+│   ├── urls.py              # Main URL configuration
+│   ├── asgi.py
+│   └── wsgi.py
+└── weather/                 # Weather app
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── tests.py
+    ├── views.py             # View logic for weather data
+    ├── urls.py              # App URL configuration
+    ├── static/
+    │   └── weather/
+    │       └── favicon.png
+    └── templates/
+        └── weather/
+            └── index.html   # Main template
+Security Best Practices
+✅ DO:
+
+Keep .env file in .gitignore
+
+Use environment variables for all secrets
+
+Provide .env.example as a template
+
+Regenerate API keys if accidentally exposed
+
+❌ DON'T:
+
+Commit .env file to Git
+
+Hardcode API keys in source code
+
+Share API keys publicly
+
+Use production keys in development
+
+Troubleshooting
+"API key not found" Error
+Solution: Make sure:
+
+.env file exists in project root
+
+.env contains API_KEY=your_key
+
+No spaces around = sign
+
+python-decouple is installed
+
+"City not found" Error
+Solution:
+
+Check spelling of city name
+
+Try adding country code: "London,UK"
+
+Some small cities may not be in the database
+
+Virtual Environment Not Activating
+Windows:
+
+text
+venv\Scripts\activate.bat
+Mac/Linux:
+
+text
+source venv/bin/activate
