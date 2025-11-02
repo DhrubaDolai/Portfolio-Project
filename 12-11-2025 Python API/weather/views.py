@@ -1,11 +1,12 @@
 from django.shortcuts import render
 import requests
+from decouple import config  # Add this import
 
 # Create your views here.
 
 def index(request):
     city = request.GET.get('city', 'New York')
-    api_key = "5b5efdc438feedcfca776e51d57df214"
+    api_key = config('API_KEY')  # Get from .env file instead of hardcoding
     url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
     weather_data = {}
