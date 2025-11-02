@@ -1,0 +1,46 @@
+Steps take to create the First Website.
+1) Open cmd using the folder where you want to create the virtual envirnment python -m venv vnev (to create virtual envirnment)
+2) vnev\Scripts\activate.bat (to activate the virtual envirnment)
+3) pip install Flask (to install the Flask) (Flask is a lightweight and flexible web framework for building web applications in Python. It is commonly used for creating both simple and complex web projects, ranging from REST APIs to full-featured dynamic websites.)
+4) Create index.html
+5) Create server.py in the system(in you laptop) 
+    use the below code from which is a mini example from the website: https://flask.palletsprojects.com/en/stable/quickstart/#a-minimal-application
+
+        from flask import Flask
+
+        app = Flask(__name__)
+
+        @app.route("/")
+        def hello_world():
+        return "Hello, Dhruba and Moumita!"
+6) Then use the below code in cmd in window
+
+    set FLASK_APP=server.py
+    flask run
+
+If any error is showing then check if the flask is showing
+    pip show flask
+If not found then install it again
+    pip install flask
+    
+    set FLASK_APP=server.py
+    flask run
+
+==> set FLASK_APP=server.py
+-> This sets the FLASK_APP environment variable to server.py for your current command prompt session.
+-> Flask uses the FLASK_APP variable to know which Python file contains your Flask application instance (app = Flask(__name__)).
+
+==> flask run
+-> This runs the Flask development server, using the app defined in server.py.
+-> By default, Flask serves your app at http://127.0.0.1:5000.
+
+7) Debug mode: No to do this we need to use to below code
+        set FLASK_DEBUG=1
+        set FLASK_APP=server.py
+        flask run
+    Debug mode is activated: Flask will automatically reload the server if you make changes to your code.
+
+        * Debug mode: on
+        * Debugger is active!
+        * Restarting with stat
+8) Server is now created now in server.py we need to create url which can access the page

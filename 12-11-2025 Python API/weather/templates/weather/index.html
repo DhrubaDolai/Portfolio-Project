@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static '/favicon.png' %}" type="image/x-icon"> <!-- Favicon link v=1 to prevent caching issues and ensure the latest version is loaded -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <title>Weather App</title>
+    <style>
+        .input-box-20 {
+            width: 20%;
+            min-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-5">Weather App</h1>
+
+        <div class="form-container d-flex justify-content-center">
+            <form method="get" class="input-box-20">
+                <input type="text" name="city" class="form-control form-control-lg mb-3 text-center" placeholder="Enter City Name" value='{{request.GET.city}}'>
+                <button type="submit" class="btn btn-primary btn-lg w-100">Get Weather</button>
+            </form>
+        </div>
+
+        {% if error_message %}
+            <div class="alert alert-info mt-4" role="alert">
+                Error: {{ error_message }}
+            </div>
+        {% elif weather_data %}
+            <div class="text-center jumbotron jumbotron-custom mt-4">
+                <h2 class="display-5"><b>Current Weather in {{ weather_data.city }}, {{ weather_data.country }}</b></h2>
+                <p class="lead"><strong>Temperature: </strong>{{ weather_data.temperature }} &deg;C</p>
+                <p class="lead"><strong>Description: </strong>{{ weather_data.description }}</p>
+                <p class="lead"><strong>Humidity: </strong>{{ weather_data.humidity }}%</p>
+                <p class="lead"><strong>Wind Speed: </strong>{{ weather_data.wind_speed }} m/s</p>
+                <img src="http://openweathermap.org/img/wn/{{ weather_data.icon }}@2x.png" alt="Weather Icon">
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

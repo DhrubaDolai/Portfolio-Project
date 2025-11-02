@@ -13,3 +13,48 @@ Example: dagagagavrj188884846aagga681
 # Note don't share this with any one this is dangerous
 
 https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+
+    Step2: Creating the Weather app using Django
+        a) Create a virtual envirnment open the cmd and typing python -m venv vnev
+        b) Activate the virtual envirnment typing the command vnev\Scripts\activate.bat
+        c) Then install Django by typing the command pip install Django
+        d) After installing Django run the command django-admin startproject core .
+        e) Then type code . to open visual code
+        f) Then python manage.py startapp weather
+        g) After that type 'weather', in the settings.py in the INSTALLED_APPS = [] in the core file which we created using the command django-admin startproject core . this will install the newly created app.
+        h) After this in the cmd type python manage.py runserver (this will run the server)
+        g) Go the the weather file which you created and create a .py file for urls and put the below code
+            from django.urls import path
+            from .views import index
+
+            urlpatterns = [
+            path('', index, name='index'),
+            ]
+
+    (adding the app name in INSTALLED_APPS activates the app within your Django project, making its resources and code part of the overall application. Also, it create a path to open our project over here in the core project)
+        h) Then got the core>urls.py then add path('', include('weather.urls')),
+
+        Like below:
+        from django.contrib import admin
+        from django.urls import path, include
+
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+            path('', include('weather.urls')),
+        ]
+        Here weather is the name of the application and urls is the project folder.
+
+        i) Now we need to create a index view to create the web site in the front end
+            from django.shortcuts import render
+
+            # Create your views here.
+
+            def index(request):
+            return render(request, 'weather/index.html')
+
+        j) To check what is you are getting out of the API use the breakpoint() after getting data using the follow code response = requests.get(url)
+        data = response.json()
+        data
+        This will save the data from the api you can see the data in the cmd for further the analysis
+    
+    Step3: Protect your API Key
